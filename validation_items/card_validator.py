@@ -1,3 +1,4 @@
+from errors import CardMinLengthError
 from typing import Union
 
 
@@ -9,12 +10,14 @@ class CardValidator:
         else: 
             self.card_number = card_number
         self.card_len = len(str(card_number))
+        if self.card_len < 12:
+            raise CardMinLengthError('Minimal card number length should be more or equal than 12 digits.')
 
     @classmethod
     def is_valid(cls, card_number: Union[int, list[int]]):
         return cls(card_number)._check_for_existing_card()
 
-    def _check_for_existing_card(self):
+    def _check_for_existing_card(self) -> bool:
         even = False
         if self.card_len % 2 == 0:
             even = True
@@ -47,19 +50,19 @@ class CardValidator:
         _payment_system_pool = {
             '2': 'Мир',
             '3': {
-                ('30', '36', '38') : 'Diners Club',
-                ('31', '35') : 'JCB International',
-                ('34', '37') : 'American Express',
+                ('30', '36', '38'): 'Diners Club',
+                ('31', '35'): 'JCB International',
+                ('34', '37'): 'American Express',
             },
-            '4' : 'Visa',
-            '5' : {
-                ('50', '56', '57', '58') : 'Maestro',
-                ('51', '52', '53', '54', '55') : 'MasterCard'
+            '4': 'Visa',
+            '5': {
+                ('50', '56', '57', '58'): 'Maestro',
+                ('51', '52', '53', '54', '55'): 'MasterCard'
             },
-            '6' : {
-                '60' : 'Discover',
-                '62' : 'China UnionPay',
-                ('63', '67') : 'Maestro'
+            '6': {
+                '60': 'Discover',
+                '62': 'China UnionPay',
+                ('63', '67'): 'Maestro'
             },
             '7': 'УЭК' 
         }
@@ -73,6 +76,7 @@ class CardValidator:
                     for inner_key, bank in _payment_system_pool[first_number].items():
                         if two_first_digits in inner_key:
                             return f'{bank} payment system.'
+                    return 'Unknown payment system.'
             else:
                 return f'{_payment_system_pool[first_number]} payment system.'
 

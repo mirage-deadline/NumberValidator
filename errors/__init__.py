@@ -1,0 +1,2 @@
+class CardMinLengthError(Exception):
+    pass
